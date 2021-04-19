@@ -74,4 +74,13 @@ class Subscriber
     {
         return $this->subscriberId;
     }
+
+    public function asLoggingContext(): array
+    {
+        return [
+            'email' => $this->email,
+            'subscriberId' => $this->subscriberId,
+            'wantsSubscription' => $this->wantsSubscription,
+        ];
+    }
 }

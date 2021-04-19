@@ -5,6 +5,7 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 
 require __DIR__ . '/../../../../../tests/Functional/bootstrap.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 function fixture_path(string $relPath): string {
     return __DIR__ . '/../fixtures/' . $relPath;

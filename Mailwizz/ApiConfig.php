@@ -47,4 +47,13 @@ class ApiConfig
     {
         return $this->listId;
     }
+
+    public function asLoggingContext(): array
+    {
+        return [
+            'apiUrl' => $this->apiUrl,
+            'publicKey' => $this->publicKey,
+            'listId' => $this->listId,
+        ];
+    }
 }

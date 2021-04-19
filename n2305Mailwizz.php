@@ -8,6 +8,8 @@ use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 class n2305Mailwizz extends Plugin
 {
     public const PLUGIN_NAME = 'n2305Mailwizz';
