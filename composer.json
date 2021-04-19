@@ -1,0 +1,15 @@
+{
+    "name": "n2305/mailwizz",
+    "type": "shopware-plugin",
+    "description": "Shopware Mailwizz Plugin",
+    "version": "v1.0.0",
+    "license": "proprietary",
+    "require": {
+
+    },
+    "autoload": {
+        "psr-4": {
+
+        }
+    }
+}

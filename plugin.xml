@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.6/engine/Shopware/Components/Plugin/schema/plugin.xsd">
+    <label lang="de">n2305 Mailwizz</label>
+    <label lang="en">n2305 Mailwizz</label>
+
+    <version>1.0.0</version>
+    <copyright>(c) by n2305</copyright>
+    <license>proprietary</license>
+    <author>n2305</author>
+    <compatibility minVersion="5.6.0"/>
+
+    <changelog version="1.0.0">
+        <changes lang="de">Erstveröffentlichung</changes>
+        <changes lang="en">First release</changes>
+    </changelog>
+</plugin>

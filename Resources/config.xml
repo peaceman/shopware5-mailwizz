@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.6/engine/Shopware/Components/Plugin/schema/config.xsd">
+    <elements>
+        <element required="true" type="boolean" scope="shop">
+            <name>activeForShop</name>
+            <label lang="de">Aktiv</label>
+            <label lang="en">Active</label>
+            <value>false</value>
+            <description lang="de">Aktiviert den User-Export fuer den aktuellen Shop.</description>
+            <description lang="en">Enable, to activate user-export for the current shop.</description>
+        </element>
+
+        <element required="true" type="text" scope="shop">
+            <name>mwApiUrl</name>
+            <label lang="de">Mailwizz API URL</label>
+            <label lang="en">Mailwizz API URL</label>
+        </element>
+
+        <element required="true" type="text" scope="shop">
+            <name>mwApiPublicKey</name>
+            <label lang="de">Mailwizz API PublicKey</label>
+            <label lang="en">Mailwizz API PublicKey</label>
+        </element>
+
+        <element required="true" type="text" scope="shop">
+            <name>mwApiPrivateKey</name>
+            <label lang="de">Mailwizz API PrivateKey</label>
+            <label lang="en">Mailwizz API PrivateKey</label>
+        </element>
+
+        <element required="true" type="text" scope="shop">
+            <name>mwListId</name>
+            <label lang="de">Mailwizz ListID</label>
+            <label lang="en">Mailwizz ListID</label>
+        </element>
+
+        <element type="button">
+            <name>buttonTest</name>
+            <label lang="de">Verbindungstest durchführen</label>
+            <label lang="en">Test connectivity</label>
+            <options>
+                <handler>
+                    <![CDATA[
+                    function() {
+                      Ext.Ajax.request({
+                        url: 'MwApiTest/test',
+                        success: function (response) {
+                          const data = JSON.parse(response.responseText);
+                          (data.response || []).forEach(function (line) {
+                            Shopware.Msg.createGrowlMessage(response.statusText, line)
+                          });
+                        },
+                        failure: function (response) {
+                          if (response.status === 404) {
+                            Shopware.Msg.createGrowlMessage('Plugin Manager', 'Please activate plugin, before testing API!');
+                          } else {
+                            Shopware.Msg.createGrowlMessage(response.statusText, response.responseText)
+                          }
+                        }
+                      });
+                    }
+                    ]]>
+                </handler>
+            </options>
+        </element>
+    </elements>
+</config>

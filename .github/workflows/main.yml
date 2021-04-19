@@ -1,0 +1,65 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+    run:
+        runs-on: ${{ matrix.operating-system }}
+        strategy:
+            max-parallel: 15
+            fail-fast: false
+            matrix:
+                operating-system: [ubuntu-latest]
+                php-versions: ['7.2']
+                shopware-versions: ['v5.6.8']
+        name: Shopware ${{ matrix.shopware-versions }} on PHP ${{ matrix.php-versions }}
+        services:
+            mysql:
+                image: mysql:5.7.27
+                env:
+                    MYSQL_ROOT_PASSWORD: root
+                ports:
+                    - 3306:3306
+        steps:
+            - name: Checkout
+              uses: actions/checkout@master
+
+            - name: Install PHP
+              uses: shivammathur/setup-php@master
+              with:
+                  php-version: ${{ matrix.php-versions }}
+                  extensions: mbstring, xdebug, curl, dom, fileinfo, gd, iconv, intl, json, xml, mbstring, pdo, phar, zip, pdo_mysql
+                  tools: composer, prestissimo
+                  coverage: none
+
+            - name: Check PHP Version
+              run: php -v
+            - name: Check Composer Version
+              run: composer -V
+            - name: Check PHP Extensions
+              run: php -m
+
+            - name: PHPUnit
+              run: |
+                  mkdir /tmp/shopware
+                  git clone https://github.com/shopware/shopware /tmp/shopware
+                  mkdir /tmp/shopware/custom/plugins/n2305Mailwizz
+                  cp -r * /tmp/shopware/custom/plugins/n2305Mailwizz/
+                  printf "const:\n    APP_ENV: \"dev\"\n    APP_URL: \"http://localhost\"\n    DB_HOST: \"127.0.0.1\"\n    DB_PORT: \"3306\"\n    DB_NAME: \"shopware\"\n    DB_USER: \"root\"\n    DB_PASSWORD: \"root\"" > /tmp/shopware/.psh.yaml.override
+                  cd /tmp/shopware
+                  git checkout tags/${{ matrix.shopware-versions }}
+                  php psh.phar init --DB_HOST=127.0.0.1 --DB_USER=root --DB_PASSWORD=root --SW_HOST=localhost
+                  php /tmp/shopware/bin/console sw:plugin:install --clear-cache --activate n2305Mailwizz
+                  /tmp/shopware/vendor/bin/phpunit --configuration custom/plugins/n2305Mailwizz/phpunit.xml.dist
+
+            - name: Prepare production artifact files
+              working-directory: /tmp/shopware/custom/plugins/n2305Mailwizz
+              run: |
+                  mkdir -p /tmp/plugin/n2305Mailwizz
+                  cp -r * /tmp/plugin/n2305Mailwizz
+
+            - name: Archive production artifact
+              uses: actions/upload-artifact@v1
+              with:
+                  name: n2305Mailwizz
+                  path: /tmp/plugin
