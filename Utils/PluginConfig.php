@@ -2,6 +2,7 @@
 
 namespace n2305Mailwizz\Utils;
 
+use n2305Mailwizz\Mailwizz;
 use n2305Mailwizz\n2305Mailwizz;
 use Shopware\Components\Plugin\ConfigReader;
 use Shopware\Models\Shop\Shop;
@@ -47,9 +48,19 @@ class PluginConfig
         return $this->fetchFromConfigReader('mwApiPrivateKey');
     }
 
-    public function gtMwListId(): ?string
+    public function getMwListId(): ?string
     {
         return $this->fetchFromConfigReader('mwListId');
+    }
+
+    public function getMwApiConfig(): Mailwizz\ApiConfig
+    {
+        return new Mailwizz\ApiConfig(
+            $this->getMwApiUrl(),
+            $this->getMwApiPublicKey(),
+            $this->getMwApiPrivateKey(),
+            $this->getMwListId()
+        );
     }
 
     protected function fetchFromConfigReader(string $key)

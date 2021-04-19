@@ -4,14 +4,14 @@ namespace n2305Mailwizz\Subscriber;
 
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs;
-use n2305Mailwizz\Services\ShopUserExporter;
+use n2305Mailwizz\Services\ShopCustomerExporter;
 
 class ExportUsersToMailwizz implements SubscriberInterface
 {
-    /** @var ShopUserExporter */
+    /** @var ShopCustomerExporter */
     private $shopUserExporter;
 
-    public function __construct(ShopUserExporter $shopUserExporter)
+    public function __construct(ShopCustomerExporter $shopUserExporter)
     {
         $this->shopUserExporter = $shopUserExporter;
     }

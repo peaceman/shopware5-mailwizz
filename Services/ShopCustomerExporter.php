@@ -5,7 +5,7 @@ namespace n2305Mailwizz\Services;
 use Psr\Log\LoggerInterface;
 use Shopware\Models\Shop\Shop;
 
-class ShopUserExporter
+class ShopCustomerExporter
 {
     /** @var LoggerInterface */
     private $logger;
@@ -35,7 +35,7 @@ class ShopUserExporter
 
         $counter = 0;
         foreach ($this->customerProvider->fetch($shop) as $user) {
-            $this->customerExporter->export($user);
+            $this->customerExporter->export($user, CustomerExportMode::periodicImport());
             $counter++;
         }
 
