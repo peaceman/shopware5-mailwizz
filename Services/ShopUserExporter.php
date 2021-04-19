@@ -10,20 +10,20 @@ class ShopUserExporter
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var ShopUserProvider */
-    private $userProvider;
+    /** @var ShopCustomerProvider */
+    private $customerProvider;
 
-    /** @var UserExporter */
-    private $userExporter;
+    /** @var CustomerExporter */
+    private $customerExporter;
 
     public function __construct(
         LoggerInterface $logger,
-        ShopUserProvider $userProvider,
-        UserExporter $userExporter
+        ShopCustomerProvider $userProvider,
+        CustomerExporter $userExporter
     ) {
         $this->logger = $logger;
-        $this->userProvider = $userProvider;
-        $this->userExporter = $userExporter;
+        $this->customerProvider = $userProvider;
+        $this->customerExporter = $userExporter;
     }
 
     public function export(Shop $shop): void
@@ -34,8 +34,8 @@ class ShopUserExporter
         $startTime = microtime(true);
 
         $counter = 0;
-        foreach ($this->userProvider->fetch($shop) as $user) {
-            $this->userExporter->export($user);
+        foreach ($this->customerProvider->fetch($shop) as $user) {
+            $this->customerExporter->export($user);
             $counter++;
         }
 

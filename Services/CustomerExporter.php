@@ -7,7 +7,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\User\User;
 
-class UserExporter
+class CustomerExporter
 {
     /** @var LoggerInterface */
     private $logger;
