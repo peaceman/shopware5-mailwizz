@@ -41,6 +41,7 @@ jobs:
 
             - name: PHPUnit
               run: |
+                  composer install --prefer-dist --no-dev --optimize-autoloader
                   mkdir /tmp/shopware
                   git clone https://github.com/shopware/shopware /tmp/shopware
                   mkdir /tmp/shopware/custom/plugins/n2305Mailwizz
