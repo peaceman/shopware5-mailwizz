@@ -13,10 +13,15 @@ jobs:
       SHOPWARE_VERSION: v5.6.8
       PHP_VERSION: 7.2
     steps:
+      - run: mkdir /tmp/n2305Mailwizz
       - uses: actions/download-artifact@v2
         id: download
         with:
           name: n2305Mailwizz-${{ env.SHOPWARE_VERSION }}-${{ env.PHP_VERSION }}
+          path: /tmp/n2305Mailwizz
+
+      - run: zip n2305Mailwizz.zip n2305Mailwizz
+        working-directory: /tmp
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -25,7 +30,7 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            ${{steps.download.outputs.download-path}}
+            /tmp/n2305Mailwizz.zip
 
   test:
     runs-on: ${{ matrix.operating-system }}
