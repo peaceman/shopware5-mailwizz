@@ -10,8 +10,8 @@ jobs:
             fail-fast: false
             matrix:
                 operating-system: [ ubuntu-latest ]
-                php-versions: [ '7.0' ]
-                shopware-versions: [ 'v5.5.3' ]
+                php-versions: [ '7.2' ]
+                shopware-versions: [ 'v5.6.8' ]
         name: Shopware ${{ matrix.shopware-versions }} on PHP ${{ matrix.php-versions }}
         services:
             mysql:
