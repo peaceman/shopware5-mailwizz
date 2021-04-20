@@ -20,6 +20,9 @@ jobs:
           name: n2305Mailwizz-${{ env.SHOPWARE_VERSION }}-${{ env.PHP_VERSION }}
           path: /tmp/n2305Mailwizz
 
+      - run: ls -R
+        working-directory: /tmp
+
       - run: zip n2305Mailwizz.zip n2305Mailwizz
         working-directory: /tmp
 
