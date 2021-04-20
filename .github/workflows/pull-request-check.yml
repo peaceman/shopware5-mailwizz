@@ -1,6 +1,6 @@
-name: CI
+name: pull-request-check
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
     run:
