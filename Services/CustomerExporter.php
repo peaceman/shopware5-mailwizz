@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Customer\Customer;
 use Shopware\Models\Attribute\Customer as CustomerAttribute;
+use Throwable;
 
 class CustomerExporter
 {
@@ -41,7 +42,17 @@ class CustomerExporter
         $pluginConfig = $this->pluginConfig->forShop($shop);
         $apiClient = $this->mwApiClientFactory->create($pluginConfig->getMwApiConfig());
 
-        $subscriber = Mailwizz\Subscriber::createFromCustomer($customer);
+        try {
+            $subscriber = Mailwizz\Subscriber::createFromCustomer($customer);
+        } catch (Throwable $e) {
+            $this->logger->warn('Failed to create subscriber dto from customer', [
+                'customer' => ['id' => $customer->getId(), 'email' => $customer->getEmail()],
+                'exception' => $e,
+            ]);
+
+            return;
+        }
+
         $subscriberId = $apiClient->createOrUpdateSubscriber(
             $subscriber,
             $this->determineSubscriberStatus($subscriber, $exportMode)

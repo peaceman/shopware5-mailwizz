@@ -43,8 +43,8 @@ class Subscriber
     {
         return new static(
             $customer->getEmail(),
-            $customer->getFirstname(),
-            $customer->getLastname(),
+            $customer->getFirstname() ?? '',
+            $customer->getLastname() ?? '',
             (bool) $customer->getNewsletter(),
             null
         );
