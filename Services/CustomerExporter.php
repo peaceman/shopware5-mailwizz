@@ -35,7 +35,7 @@ class CustomerExporter
         $this->mwApiClientFactory = $mwApiClientFactory;
     }
 
-    public function export(Customer $customer, CustomerExportMode $exportMode): void
+    public function export(Customer $customer, CustomerExportMode $exportMode)
     {
         $shop = $customer->getShop();
         $pluginConfig = $this->pluginConfig->forShop($shop);
@@ -64,7 +64,7 @@ class CustomerExporter
     private function storeSubscriberIdAtCustomer(
         string $subscriptionId,
         Customer $customer
-    ): void {
+    ) {
         $attr = $customer->getAttribute() ?? new CustomerAttribute();
         $attr->setMailwizzSubscriberId($subscriptionId);
 

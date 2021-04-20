@@ -26,7 +26,7 @@ class ShopCustomerExporter
         $this->customerExporter = $userExporter;
     }
 
-    public function export(Shop $shop): void
+    public function export(Shop $shop)
     {
         $this->logger->info('Start exporting users of shop', [
             'shop' => ['id' => $shop->getId(), 'name' => $shop->getName()],

@@ -10,7 +10,7 @@ use Shopware\Models\Attribute\Customer as CustomerAttribute;
 
 class ExportableShopCustomerProvider implements ShopCustomerProvider
 {
-    private const CHUNK_SIZE = 25;
+    const CHUNK_SIZE = 25;
 
     /** @var ModelManager */
     private $modelManager;
@@ -20,7 +20,7 @@ class ExportableShopCustomerProvider implements ShopCustomerProvider
         $this->modelManager = $modelManager;
     }
 
-    public function fetch(Shop $shop): iterable
+    public function fetch(Shop $shop)
     {
         $lastUserId = null;
 

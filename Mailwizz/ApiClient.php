@@ -25,7 +25,7 @@ class ApiClient
         $this->endpointFactory = $endpointFactory;
     }
 
-    public function createOrUpdateSubscriber(Subscriber $subscriber, string $status): ?string
+    public function createOrUpdateSubscriber(Subscriber $subscriber, string $status)
     {
         $endpoint = $this->endpointFactory->getListSubscribers();
         $data = [

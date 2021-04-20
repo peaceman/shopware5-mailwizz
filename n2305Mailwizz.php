@@ -48,7 +48,7 @@ class n2305Mailwizz extends Plugin
         $this->regenerateAttributeModels(['s_user_attributes']);
     }
 
-    private function regenerateAttributeModels(array $attributeTables): void
+    private function regenerateAttributeModels(array $attributeTables)
     {
         $metaDataCache = Shopware()->Models()->getConfiguration()->getMetadataCacheImpl();
         $metaDataCache->deleteAll();

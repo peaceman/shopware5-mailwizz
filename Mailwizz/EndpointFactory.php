@@ -44,7 +44,7 @@ class EndpointFactory
         return $endpoint;
     }
 
-    private function getEndpoint(string $class): object
+    private function getEndpoint(string $class)
     {
         if (is_null($endpoint = $this->endpointCache[$class] ?? null)) {
             $endpoint = $this->endpointCache[$class] = new $class();

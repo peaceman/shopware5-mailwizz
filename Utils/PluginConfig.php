@@ -20,7 +20,7 @@ class PluginConfig
         $this->configReader = $configReader;
     }
 
-    public function forShop(?Shop $shop): PluginConfig
+    public function forShop($shop): PluginConfig
     {
         $configService = new static($this->configReader);
         $configService->shop = $shop;
@@ -33,22 +33,22 @@ class PluginConfig
         return $this->fetchFromConfigReader($key) ?? $default;
     }
 
-    public function getMwApiUrl(): ?string
+    public function getMwApiUrl()
     {
         return $this->fetchFromConfigReader('mwApiUrl');
     }
 
-    public function getMwApiPublicKey(): ?string
+    public function getMwApiPublicKey()
     {
         return $this->fetchFromConfigReader('mwApiPublicKey');
     }
 
-    public function getMwApiPrivateKey(): ?string
+    public function getMwApiPrivateKey()
     {
         return $this->fetchFromConfigReader('mwApiPrivateKey');
     }
 
-    public function getMwListId(): ?string
+    public function getMwListId()
     {
         return $this->fetchFromConfigReader('mwListId');
     }

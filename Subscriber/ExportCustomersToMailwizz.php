@@ -23,7 +23,7 @@ class ExportCustomersToMailwizz implements SubscriberInterface
         ];
     }
 
-    public function onExportCustomers(Enlight_Event_EventArgs $e): void
+    public function onExportCustomers(Enlight_Event_EventArgs $e)
     {
         $this->shopCustomerExporter->export($e->get('shop'));
     }

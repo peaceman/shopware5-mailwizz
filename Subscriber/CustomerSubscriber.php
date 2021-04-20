@@ -24,7 +24,7 @@ class CustomerSubscriber implements EventSubscriber
         $this->logger = $logger;
     }
 
-    public function setEnabled(bool $enabled): void
+    public function setEnabled(bool $enabled)
     {
         $this->enabled = $enabled;
     }
@@ -37,17 +37,17 @@ class CustomerSubscriber implements EventSubscriber
         ];
     }
 
-    public function postPersist(LifecycleEventArgs $args): void
+    public function postPersist(LifecycleEventArgs $args)
     {
         $this->handleModelEvent($args);
     }
 
-    public function postUpdate(LifecycleEventArgs $args): void
+    public function postUpdate(LifecycleEventArgs $args)
     {
         $this->handleModelEvent($args);
     }
 
-    private function handleModelEvent(LifecycleEventArgs $args): void
+    private function handleModelEvent(LifecycleEventArgs $args)
     {
         if (!$this->enabled) return;
 

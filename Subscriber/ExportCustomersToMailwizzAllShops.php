@@ -43,7 +43,7 @@ class ExportCustomersToMailwizzAllShops implements SubscriberInterface
         ];
     }
 
-    public function onExportCustomers(): void
+    public function onExportCustomers()
     {
         /** @var ShopRepo $shopRepo */
         $shopRepo = $this->modelManager->getRepository(Shop::class);

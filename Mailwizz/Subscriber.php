@@ -30,7 +30,7 @@ class Subscriber
         string $firstName,
         string $lastName,
         bool $wantsSubscription,
-        ?string $subscriberId
+        $subscriberId
     ) {
         $this->email = $email;
         $this->firstName = $firstName;
@@ -70,7 +70,7 @@ class Subscriber
         return $this->wantsSubscription;
     }
 
-    public function getSubscriberId(): ?string
+    public function getSubscriberId()
     {
         return $this->subscriberId;
     }

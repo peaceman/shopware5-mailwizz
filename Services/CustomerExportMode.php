@@ -4,8 +4,8 @@ namespace n2305Mailwizz\Services;
 
 class CustomerExportMode
 {
-    private const PERIODIC_IMPORT = 'periodic-import';
-    private const ADHOC_UPDATE = 'adhoc-update';
+    const PERIODIC_IMPORT = 'periodic-import';
+    const ADHOC_UPDATE = 'adhoc-update';
 
     private function __construct(string $mode)
     {
