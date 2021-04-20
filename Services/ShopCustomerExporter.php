@@ -37,6 +37,9 @@ class ShopCustomerExporter
         foreach ($this->customerProvider->fetch($shop) as $user) {
             $this->customerExporter->export($user, CustomerExportMode::periodicImport());
             $counter++;
+
+            // 2 min time limit
+            if ((microtime(true) - $startTime) >= 120) break;
         }
 
         $this->logger->info('Finished exporting users of shop', [
