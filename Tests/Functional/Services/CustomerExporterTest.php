@@ -23,6 +23,9 @@ class CustomerExporterTest extends TestCase
 
         $this->modelManager = Shopware()->Container()->get('models');
         $this->modelManager->beginTransaction();
+
+        // disable event handling during tests
+        Shopware()->Container()->get('n2305_mailwizz.subscriber.customer_subscriber')->setEnabled(false);
     }
 
     protected function tearDown(): void

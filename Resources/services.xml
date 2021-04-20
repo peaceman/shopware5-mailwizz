@@ -7,6 +7,63 @@
         <parameter key="n2305_mailwizz.logger.level">DEBUG</parameter>
     </parameters>
     <services>
+        <service id="n2305_mailwizz.utils.plugin_config"
+                 class="n2305Mailwizz\Utils\PluginConfig"
+        >
+            <argument type="service" id="shopware.plugin.cached_config_reader"/>
+        </service>
 
+        <service id="n2305_mailwizz.subscriber.customer_subscriber"
+                 class="n2305Mailwizz\Subscriber\CustomerSubscriber"
+        >
+            <argument type="service" id="n2305_mailwizz.logger"/>
+            <tag name="doctrine.event_subscriber"/>
+        </service>
+
+        <service id="n2305_mailwizz.services.customer_exporter"
+                 class="n2305Mailwizz\Services\CustomerExporter"
+        >
+            <argument type="service" id="n2305_mailwizz.logger"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="n2305_mailwizz.utils.plugin_config"/>
+            <argument type="service" id="n2305_mailwizz.mailwizz.api_client_factory"/>
+        </service>
+
+        <service id="n2305_mailwizz.mailwizz.api_client_factory"
+                 class="n2305Mailwizz\Mailwizz\ApiClientFactory"
+        >
+            <argument type="service" id="n2305_mailwizz.logger"/>
+        </service>
+
+        <service id="n2305_mailwizz.subscriber.export_customers_to_mailwizz"
+                 class="n2305Mailwizz\Subscriber\ExportCustomersToMailwizz"
+        >
+            <argument type="service" id="n2305_mailwizz.services.shop_customer_exporter"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+
+        <service id="n2305_mailwizz.subscriber.export_customers_to_mailwizz_all_shops"
+                 class="n2305Mailwizz\Subscriber\ExportCustomersToMailwizzAllShops"
+        >
+            <argument type="service" id="n2305_mailwizz.logger"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="n2305_mailwizz.utils.plugin_config"/>
+            <argument type="service" id="events"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+
+        <service id="n2305_mailwizz.services.shop_customer_exporter"
+                 class="n2305Mailwizz\Services\ShopCustomerExporter"
+        >
+            <argument type="service" id="n2305_mailwizz.logger"/>
+            <argument type="service" id="n2305_mailwizz.services.shop_customer_provider"/>
+            <argument type="service" id="n2305_mailwizz.services.customer_exporter"/>
+        </service>
+
+        <service id="n2305_mailwizz.services.shop_customer_provider"
+                 class="n2305Mailwizz\Services\ExportableShopCustomerProvider"
+        >
+            <argument type="service" id="models"/>
+        </service>
     </services>
 </container>

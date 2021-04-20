@@ -61,8 +61,10 @@ class CustomerExporter
         }
     }
 
-    private function storeSubscriberIdAtCustomer(string $subscriptionId, Customer $customer): void
-    {
+    private function storeSubscriberIdAtCustomer(
+        string $subscriptionId,
+        Customer $customer
+    ): void {
         $attr = $customer->getAttribute() ?? new CustomerAttribute();
         $attr->setMailwizzSubscriberId($subscriptionId);
 

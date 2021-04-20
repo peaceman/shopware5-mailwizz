@@ -10,7 +10,7 @@ use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Shop\Repository as ShopRepo;
 use Shopware\Models\Shop\Shop;
 
-class ExportUsersToMailwizzAllShops implements SubscriberInterface
+class ExportCustomersToMailwizzAllShops implements SubscriberInterface
 {
     /** @var LoggerInterface */
     private $logger;
@@ -39,11 +39,11 @@ class ExportUsersToMailwizzAllShops implements SubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            'Shopware_CronJob_ExportUsersToMailwizzAllShops' => 'onExportUsers',
+            'Shopware_CronJob_ExportCustomersToMailwizzAllShops' => 'onExportCustomers',
         ];
     }
 
-    public function onExportUsers(): void
+    public function onExportCustomers(): void
     {
         /** @var ShopRepo $shopRepo */
         $shopRepo = $this->modelManager->getRepository(Shop::class);
@@ -59,7 +59,7 @@ class ExportUsersToMailwizzAllShops implements SubscriberInterface
             ]);
 
             $this->eventManager->notify(
-                'ExportUsersToMailwizz',
+                'ExportCustomersToMailwizz',
                 ['shop' => $shop, 'pluginConfig' => $shopPluginConfig]
             );
         }
