@@ -12,7 +12,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 class n2305Mailwizz extends Plugin
 {
-    public const PLUGIN_NAME = 'n2305Mailwizz';
+    const PLUGIN_NAME = 'n2305Mailwizz';
 
     public function install(InstallContext $installContext)
     {

@@ -6,9 +6,9 @@ use Shopware\Models\Customer\Customer;
 
 class Subscriber
 {
-    public const STATE_CONFIRMED = 'confirmed';
-    public const STATE_UNCONFIRMED = 'unconfirmed';
-    public const STATE_UNSUBSCRIBED = 'unsubscribed';
+    const STATE_CONFIRMED = 'confirmed';
+    const STATE_UNCONFIRMED = 'unconfirmed';
+    const STATE_UNSUBSCRIBED = 'unsubscribed';
 
     /** @var string */
     private $email;
