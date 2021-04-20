@@ -19,10 +19,7 @@ jobs:
           name: n2305Mailwizz-${{ env.SHOPWARE_VERSION }}-${{ env.PHP_VERSION }}
           path: /tmp
 
-      - run: ls -R || true
-        working-directory: /tmp
-
-      - run: zip n2305Mailwizz.zip n2305Mailwizz
+      - run: zip -r n2305Mailwizz.zip n2305Mailwizz
         working-directory: /tmp
 
       - uses: "marvinpinto/action-automatic-releases@latest"
