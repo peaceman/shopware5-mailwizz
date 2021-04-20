@@ -16,14 +16,14 @@
         <service id="n2305_mailwizz.subscriber.customer_subscriber"
                  class="n2305Mailwizz\Subscriber\CustomerSubscriber"
         >
-            <argument type="service" id="n2305_mailwizz.logger"/>
+            <argument type="service" id="corelogger"/>
             <tag name="doctrine.event_subscriber"/>
         </service>
 
         <service id="n2305_mailwizz.services.customer_exporter"
                  class="n2305Mailwizz\Services\CustomerExporter"
         >
-            <argument type="service" id="n2305_mailwizz.logger"/>
+            <argument type="service" id="corelogger"/>
             <argument type="service" id="models"/>
             <argument type="service" id="n2305_mailwizz.utils.plugin_config"/>
             <argument type="service" id="n2305_mailwizz.mailwizz.api_client_factory"/>
@@ -32,7 +32,7 @@
         <service id="n2305_mailwizz.mailwizz.api_client_factory"
                  class="n2305Mailwizz\Mailwizz\ApiClientFactory"
         >
-            <argument type="service" id="n2305_mailwizz.logger"/>
+            <argument type="service" id="corelogger"/>
         </service>
 
         <service id="n2305_mailwizz.subscriber.export_customers_to_mailwizz"
@@ -45,7 +45,7 @@
         <service id="n2305_mailwizz.subscriber.export_customers_to_mailwizz_all_shops"
                  class="n2305Mailwizz\Subscriber\ExportCustomersToMailwizzAllShops"
         >
-            <argument type="service" id="n2305_mailwizz.logger"/>
+            <argument type="service" id="corelogger"/>
             <argument type="service" id="models"/>
             <argument type="service" id="n2305_mailwizz.utils.plugin_config"/>
             <argument type="service" id="events"/>
@@ -55,7 +55,7 @@
         <service id="n2305_mailwizz.services.shop_customer_exporter"
                  class="n2305Mailwizz\Services\ShopCustomerExporter"
         >
-            <argument type="service" id="n2305_mailwizz.logger"/>
+            <argument type="service" id="corelogger"/>
             <argument type="service" id="n2305_mailwizz.services.shop_customer_provider"/>
             <argument type="service" id="n2305_mailwizz.services.customer_exporter"/>
         </service>
