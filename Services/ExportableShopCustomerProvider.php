@@ -29,7 +29,7 @@ class ExportableShopCustomerProvider implements ShopCustomerProvider
             $qb->select('customer')
                 ->from(Customer::class, 'customer')
                 ->leftJoin(CustomerAttribute::class, 'attribute', Join::WITH, 'attribute.customer = customer.id')
-                ->where($qb->expr()->isNull('attribute.id'))
+                ->where($qb->expr()->isNull('attribute.mailwizzSubscriberId'))
                 ->andWhere($qb->expr()->eq('customer.shop', ':shop'))
                 ->setParameter('shop', $shop)
                 ->orderBy('customer.id', 'asc')
