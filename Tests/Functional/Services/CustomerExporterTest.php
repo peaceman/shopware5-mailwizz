@@ -11,6 +11,7 @@ use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Customer\Customer;
 use Shopware\Models\Shop\Shop;
 use Shopware\Tests\Functional\Components\Plugin\TestCase;
+use Shopware\Models\Attribute\Customer as CustomerAttribute;
 
 class CustomerExporterTest extends TestCase
 {
@@ -134,5 +135,105 @@ class CustomerExporterTest extends TestCase
 
         static::assertNotNull($customerAttr, "customer doesn't have an attributes object");
         static::assertEquals('subscriber-id', $customerAttr->getMailwizzSubscriberId());
+    }
+
+    public function testCustomerExportWithBlacklistedEmail(): void
+    {
+        $shop = $this->modelManager->find(Shop::class, 1);
+
+        $customer = new Customer();
+        $customer->setEmail('foo@example.com');
+        $customer->setFirstname('foo');
+        $customer->setLastname('bar');
+        $customer->setNewsletter(1);
+        $customer->setShop($shop);
+
+        $this->modelManager->persist($customer);
+        $this->modelManager->flush();
+
+        $mwApiConfig = new Mailwizz\ApiConfig(
+            'https://example.com/api',
+            'public-key',
+            'secret-key',
+            'list-id'
+        );
+
+        $pluginConfig = $this->createMock(PluginConfig::class);
+        $pluginConfig->expects(static::once())
+            ->method('forShop')
+            ->with($shop)
+            ->willReturnSelf();
+
+        $pluginConfig->expects(static::once())
+            ->method('getMwApiConfig')
+            ->willReturn($mwApiConfig);
+
+        $mwApiClient = $this->createMock(Mailwizz\ApiClient::class);
+        $mwApiClient->expects(static::once())
+            ->method('createOrUpdateSubscriber')
+            ->withAnyParameters()
+            ->willThrowException(new Mailwizz\EmailBlacklistedException('foo@example.com'));
+
+        $mwApiClientFactory = $this->createMock(Mailwizz\ApiClientFactory::class);
+        $mwApiClientFactory->expects(static::once())
+            ->method('create')
+            ->with($mwApiConfig)
+            ->willReturn($mwApiClient);
+
+        $exporter = new CustomerExporter(
+            new NullLogger(),
+            $this->modelManager,
+            $pluginConfig,
+            $mwApiClientFactory
+        );
+
+        $exporter->export($customer, CustomerExportMode::adhocUpdate());
+
+        // assert customer has the blacklisted subscriber id
+        /** @var Customer $customer */
+        $customer = $this->modelManager->find(Customer::class, $customer->getId());
+        $customerAttr = $customer->getAttribute();
+
+        static::assertNotNull($customerAttr, "customer doesn't have an attributes object");
+        static::assertEquals('blacklisted', $customerAttr->getMailwizzSubscriberId());
+    }
+
+    public function testThatBlacklistedSubscriberIdsWontGetExported(): void
+    {
+        $shop = $this->modelManager->find(Shop::class, 1);
+
+        $customer = new Customer();
+        $customer->setEmail('foo@example.com');
+        $customer->setFirstname('foo');
+        $customer->setLastname('bar');
+        $customer->setNewsletter(1);
+        $customer->setShop($shop);
+
+        $attr = new CustomerAttribute();
+        $attr->setMailwizzSubscriberId(Mailwizz\Subscriber::SUBSCRIBER_ID_BLACKLISTED);
+        $customer->setAttribute($attr);
+
+        $this->modelManager->persist($customer);
+        $this->modelManager->persist($attr);
+        $this->modelManager->flush();
+
+        $pluginConfig = $this->createMock(PluginConfig::class);
+        $pluginConfig->expects(static::never())
+            ->method('forShop')
+            ->withAnyParameters();
+
+        $mwApiClientFactory = $this->createMock(Mailwizz\ApiClientFactory::class);
+        $mwApiClientFactory->expects(static::never())
+            ->method('create')
+            ->withAnyParameters();
+
+        $exporter = new CustomerExporter(
+            new NullLogger(),
+            $this->modelManager,
+            $pluginConfig,
+            $mwApiClientFactory
+        );
+
+        $exporter->export($customer, CustomerExportMode::adhocUpdate());
     }
 }

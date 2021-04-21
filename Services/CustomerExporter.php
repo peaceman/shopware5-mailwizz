@@ -38,10 +38,6 @@ class CustomerExporter
 
     public function export(Customer $customer, CustomerExportMode $exportMode)
     {
-        $shop = $customer->getShop();
-        $pluginConfig = $this->pluginConfig->forShop($shop);
-        $apiClient = $this->mwApiClientFactory->create($pluginConfig->getMwApiConfig());
-
         try {
             $subscriber = Mailwizz\Subscriber::createFromCustomer($customer);
         } catch (Throwable $e) {
@@ -53,22 +49,34 @@ class CustomerExporter
             return;
         }
 
-        $subscriberId = $apiClient->createOrUpdateSubscriber(
-            $subscriber,
-            $this->determineSubscriberStatus($subscriber, $exportMode)
-        );
-
-        if (empty($subscriberId)) {
-            $this->logger->warn('Failed to create or update subscriber', [
-                'shop' => ['id' => $shop->getId(), 'name' => $shop->getName()],
-                'customer' => ['id' => $customer->getId(), 'email' => $customer->getEmail()],
-            ]);
-
+        if ($subscriber->isBlacklisted()) {
             return;
         }
 
-        if (empty($subscriber->getSubscriberId())) {
-            $this->storeSubscriberIdAtCustomer($subscriberId, $customer);
+        $shop = $customer->getShop();
+        $pluginConfig = $this->pluginConfig->forShop($shop);
+        $apiClient = $this->mwApiClientFactory->create($pluginConfig->getMwApiConfig());
+
+        try {
+            $subscriberId = $apiClient->createOrUpdateSubscriber(
+                $subscriber,
+                $this->determineSubscriberStatus($subscriber, $exportMode)
+            );
+
+            if (empty($subscriberId)) {
+                $this->logger->warn('Failed to create or update subscriber', [
+                    'shop' => ['id' => $shop->getId(), 'name' => $shop->getName()],
+                    'customer' => ['id' => $customer->getId(), 'email' => $customer->getEmail()],
+                ]);
+
+                return;
+            }
+
+            if (empty($subscriber->getSubscriberId())) {
+                $this->storeSubscriberIdAtCustomer($subscriberId, $customer);
+            }
+        } catch (Mailwizz\EmailBlacklistedException $e) {
+            $this->storeSubscriberIdAtCustomer(Mailwizz\Subscriber::SUBSCRIBER_ID_BLACKLISTED, $customer);
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace n2305Mailwizz\Mailwizz;
 
+use MailWizzApi_Http_Response;
 use Psr\Log\LoggerInterface;
 
 class ApiClient
@@ -40,6 +41,7 @@ class ApiClient
         try {
             if ($subscriber->getSubscriberId()) {
                 $response = $endpoint->update($this->config->getListId(), $subscriber->getSubscriberId(), $data);
+                $this->checkForBlacklistedEmailError($response, $subscriber->getEmail());
 
                 if (!empty($message = $response->getMessage())) {
                     $this->logger->error('An error occurred during mailwizz subscriber update', [
@@ -54,6 +56,7 @@ class ApiClient
                 return $subscriber->getSubscriberId();
             } else {
                 $response = $endpoint->createUpdate($this->config->getListId(), $data);
+                $this->checkForBlacklistedEmailError($response, $subscriber->getEmail());
 
                 if (!empty($message = $response->getMessage())) {
                     $this->logger->error('An error occurred during mailwizz subscriber create/update', [
@@ -67,6 +70,8 @@ class ApiClient
 
                 return $response->body['data']['record']['subscriber_uid'] ?? null;
             }
+        } catch (EmailBlacklistedException $e) {
+            throw $e;
         } catch (\Exception $e) {
             $this->logger->error('An exception occurred during create or update of a mailwizz subscriber', [
                 'subscriber' => $subscriber->asLoggingContext(),
@@ -75,6 +80,17 @@ class ApiClient
             ]);
 
             return null;
+        }
+    }
+
+    private function checkForBlacklistedEmailError(MailWizzApi_Http_Response $response, string $email): void
+    {
+        if ($response->getCode() != 409) return;
+
+        $error = strtolower($response->body['error'] ?? '');
+
+        if (strpos($error, 'blacklisted') !== false) {
+            throw new EmailBlacklistedException($email);
         }
     }
 }

@@ -4,6 +4,7 @@ namespace n2305Mailwizz\Tests\Unit\Mailwizz;
 
 use n2305Mailwizz\Mailwizz\ApiClient;
 use n2305Mailwizz\Mailwizz\ApiConfig;
+use n2305Mailwizz\Mailwizz\EmailBlacklistedException;
 use n2305Mailwizz\Mailwizz\EndpointFactory;
 use n2305Mailwizz\Mailwizz\Subscriber;
 use PHPUnit\Framework\TestCase;
@@ -192,6 +193,53 @@ class ApiClientTest extends TestCase
         $apiClient = $this->createApiClient($apiConfig, $endpointFactory);
         $subscriberId = $apiClient->createOrUpdateSubscriber($subscriber, $status);
         static::assertNull($subscriberId);
+    }
+
+    public function testCreateOrUpdateSubscriberBlacklisted(): void
+    {
+        $subscriber = new Subscriber('foo@bar.com', 'first', 'last', true, null);
+        $status = Subscriber::STATE_UNSUBSCRIBED;
+
+        $apiConfig = new ApiConfig('foo', 'foo', 'foo', 'list-id');
+
+        $request = new \MailWizzApi_Http_Request(new \MailWizzApi_Http_Client());
+        $request->params = new \MailWizzApi_Params();
+
+        $response = new \MailWizzApi_Http_Response($request);
+        $response->body = new \MailWizzApi_Params(['error' => 'This email address is blacklisted.']);
+        $response->setHttpCode(409);
+
+        $endpoint = $this->createMock(\MailWizzApi_Endpoint_ListSubscribers::class);
+        $endpoint->expects(static::once())
+            ->method('createUpdate')
+            ->with(
+                $apiConfig->getListId(),
+                [
+                    'EMAIL' => $subscriber->getEmail(),
+                    'FNAME' => $subscriber->getFirstName(),
+                    'LNAME' => $subscriber->getLastName(),
+                    'details' => [
+                        'status' => $status
+                    ],
+                ]
+            )
+            ->willReturn($response);
+
+        $endpointFactory = $this->createMock(EndpointFactory::class);
+        $endpointFactory->expects(static::once())
+            ->method('getListSubscribers')
+            ->willReturn($endpoint);
+
+        $apiClient = $this->createApiClient($apiConfig, $endpointFactory);
+
+        $blacklistedException = null;
+        try {
+            $apiClient->createOrUpdateSubscriber($subscriber, $status);
+        } catch (EmailBlacklistedException $e) {
+            $blacklistedException = $e;
+        }
+
+        static::assertNotNull($blacklistedException, 'blacklisted email exception was not thrown');
     }
 
     private function createApiClient(ApiConfig $apiConfig, EndpointFactory $endpointFactory): ApiClient

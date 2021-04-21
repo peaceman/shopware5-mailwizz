@@ -10,6 +10,8 @@ class Subscriber
     const STATE_UNCONFIRMED = 'unconfirmed';
     const STATE_UNSUBSCRIBED = 'unsubscribed';
 
+    const SUBSCRIBER_ID_BLACKLISTED = 'blacklisted';
+
     /** @var string */
     private $email;
 
@@ -41,12 +43,15 @@ class Subscriber
 
     public static function createFromCustomer(Customer $customer): self
     {
+        $attr = $customer->getAttribute();
+        $subscriberId = $attr ? $attr->getMailwizzSubscriberId() : null;
+
         return new static(
             $customer->getEmail(),
             $customer->getFirstname() ?? '',
             $customer->getLastname() ?? '',
             (bool) $customer->getNewsletter(),
-            null
+            $subscriberId
         );
     }
 
@@ -73,6 +78,11 @@ class Subscriber
     public function getSubscriberId()
     {
         return $this->subscriberId;
+    }
+
+    public function isBlacklisted(): bool
+    {
+        return $this->subscriberId === self::SUBSCRIBER_ID_BLACKLISTED;
     }
 
     public function asLoggingContext(): array
