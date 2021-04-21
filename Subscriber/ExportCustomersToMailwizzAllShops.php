@@ -51,7 +51,7 @@ class ExportCustomersToMailwizzAllShops implements SubscriberInterface
         /** @var Shop $shop */
         foreach ($shopRepo->getActiveShops() as $shop) {
             $shopPluginConfig = $this->pluginConfig->forShop($shop);
-            if (!$this->hasConfiguredMailwizz($shopPluginConfig))
+            if (!$shopPluginConfig->hasConfiguredMailwizz())
                 continue;
 
             $this->logger->info('Dispatching ExportUsersToMailwizz', [
@@ -63,17 +63,5 @@ class ExportCustomersToMailwizzAllShops implements SubscriberInterface
                 ['shop' => $shop, 'pluginConfig' => $shopPluginConfig]
             );
         }
-    }
-
-    private function hasConfiguredMailwizz(PluginConfig $config): bool
-    {
-        static $requiredKeys = ['mwApiUrl', 'mwApiPublicKey', 'mwApiPrivateKey', 'mwListId'];
-
-        foreach ($requiredKeys as $requiredKey) {
-            if (empty($config->get($requiredKey)))
-                return false;
-        }
-
-        return $config->isActive() && true;
     }
 }

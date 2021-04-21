@@ -79,6 +79,18 @@ class PluginConfig
         return array_values($suffixes);
     }
 
+    public function hasConfiguredMailwizz(): bool
+    {
+        static $requiredKeys = ['mwApiUrl', 'mwApiPublicKey', 'mwApiPrivateKey', 'mwListId'];
+
+        foreach ($requiredKeys as $requiredKey) {
+            if (empty($this->get($requiredKey)))
+                return false;
+        }
+
+        return $this->isActive();
+    }
+
     protected function fetchFromConfigReader(string $key)
     {
         return $this->configReader->getByPluginName(n2305Mailwizz::PLUGIN_NAME, $this->shop)[$key] ?? null;

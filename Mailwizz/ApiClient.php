@@ -93,4 +93,30 @@ class ApiClient
             throw new EmailBlacklistedException($email);
         }
     }
+
+    public function listExists(): bool
+    {
+        try {
+            $listId = $this->config->getListId();
+            $response = $this->endpointFactory->getLists()->getList($listId);
+
+            if (!empty($message = $response->getMessage())) {
+                $this->logger->error('An error occurred during mailwizz list check', [
+                    'apiConfig' => $this->config->asLoggingContext(),
+                    'message' => $message,
+                ]);
+
+                return false;
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->error('An exception occurred during mailwizz list check', [
+                'apiConfig' => $this->config->asLoggingContext(),
+                'exception' => $e,
+            ]);
+
+            return false;
+        }
+    }
 }

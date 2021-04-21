@@ -66,5 +66,15 @@
             <argument type="service" id="models"/>
             <argument type="service" id="n2305_mailwizz.utils.plugin_config"/>
         </service>
+
+        <service id="n2305_mailwizz.controller.backend.mw_api_test"
+                 class="n2305Mailwizz\Controller\Backend\MwApiTest"
+        >
+            <argument type="service" id="corelogger"/>
+            <argument type="service" id="n2305_mailwizz.mailwizz.api_client_factory"/>
+            <argument type="service" id="n2305_mailwizz.utils.plugin_config"/>
+
+            <tag name="shopware.controller" module="backend" controller="MwApiTest"/>
+        </service>
     </services>
 </container>

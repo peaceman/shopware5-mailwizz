@@ -44,6 +44,14 @@ class EndpointFactory
         return $endpoint;
     }
 
+    public function getLists(): \MailWizzApi_Endpoint_Lists
+    {
+        $endpoint = $this->getEndpoint(\MailWizzApi_Endpoint_Lists::class);
+        $endpoint::setConfig($this->getMailwizzConfig());
+
+        return $endpoint;
+    }
+
     private function getEndpoint(string $class)
     {
         if (is_null($endpoint = $this->endpointCache[$class] ?? null)) {
