@@ -83,7 +83,7 @@ class ApiClient
         }
     }
 
-    private function checkForBlacklistedEmailError(MailWizzApi_Http_Response $response, string $email): void
+    private function checkForBlacklistedEmailError(MailWizzApi_Http_Response $response, string $email)
     {
         if ($response->getCode() != 409) return;
 
