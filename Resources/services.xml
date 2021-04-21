@@ -64,6 +64,7 @@
                  class="n2305Mailwizz\Services\ExportableShopCustomerProvider"
         >
             <argument type="service" id="models"/>
+            <argument type="service" id="n2305_mailwizz.utils.plugin_config"/>
         </service>
     </services>
 </container>

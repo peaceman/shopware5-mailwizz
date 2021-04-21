@@ -63,6 +63,22 @@ class PluginConfig
         );
     }
 
+    public function getEmailBlacklistSuffixes(): array
+    {
+        $val = $this->fetchFromConfigReader('emailBlacklistSuffixes');
+        $suffixes = explode(',', $val);
+
+        $suffixes = array_map(static function ($v): string {
+            return trim($v);
+        }, $suffixes);
+
+        $suffixes = array_filter($suffixes, static function ($v): string {
+            return !empty($v);
+        });
+
+        return array_values($suffixes);
+    }
+
     protected function fetchFromConfigReader(string $key)
     {
         return $this->configReader->getByPluginName(n2305Mailwizz::PLUGIN_NAME, $this->shop)[$key] ?? null;

@@ -35,6 +35,15 @@
             <label lang="en">Mailwizz ListID</label>
         </element>
 
+        <element required="false" type="text" scope="shop">
+            <name>emailBlacklistSuffixes</name>
+            <label lang="de">Email-Suffix Blacklist</label>
+            <label lang="en">Email-Suffix Blacklist</label>
+            <value>marketplace.amazon.de</value>
+            <description lang="de">Kommaseparierte Email-Suffix List, welche vom Export ausgeschlossen werden sollen</description>
+            <description lang="en">Comma separated list of email suffixes, that are banned from exports</description>
+        </element>
+
         <element type="button">
             <name>buttonTest</name>
             <label lang="de">Verbindungstest durchführen</label>

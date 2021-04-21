@@ -3,6 +3,7 @@
 namespace n2305Mailwizz\Tests\Functional\Services;
 
 use n2305Mailwizz\Services\ExportableShopCustomerProvider;
+use n2305Mailwizz\Tests\PluginConfigMock;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Customer\Customer;
 use Shopware\Models\Shop\Shop;
@@ -31,26 +32,19 @@ class ExportableShopCustomerProviderTest extends TestCase
     public function testProvider(): void
     {
         $shop = $this->modelManager->find(Shop::class, 1);
+        $pluginConfig = new PluginConfigMock([
+            'emailBlacklistSuffixes' => 'amazon.com, blacklist.com',
+        ]);
 
         // already exported customer
-        $customer = new Customer();
-        $customer->setEmail('exported@example.com');
-
-        $customerAttribute = new \Shopware\Models\Attribute\Customer();
-        $customerAttribute->setMailwizzSubscriberId('foobar');
-        $customer->setAttribute($customerAttribute);
-
-        $this->modelManager->persist($customer);
+        $this->createExportedCustomer('exported@example.com', 'foobar', $shop);
 
         // unexported customer
-        $customer = new Customer();
-        $customer->setEmail('unexported@example.com');
-        $customer->setShop($shop);
-        $this->modelManager->persist($customer);
+        $this->createUnexportedCustomer('unexported@example.com', $shop);
+        $this->createUnexportedCustomer('unexported@amazon.com', $shop);
+        $this->createUnexportedCustomer('unexported@blacklist.com', $shop);
 
-        $this->modelManager->flush();
-
-        $provider = new ExportableShopCustomerProvider($this->modelManager);
+        $provider = new ExportableShopCustomerProvider($this->modelManager, $pluginConfig);
         $emails = [];
 
         /** @var Customer $customer */
@@ -67,5 +61,39 @@ class ExportableShopCustomerProviderTest extends TestCase
             in_array('exported@example.com', $emails),
             'found the exported user in the result set'
         );
+
+        static::assertFalse(
+            in_array('unexported@amazon.com', $emails),
+            'found the blacklisted user in the result set'
+        );
+
+        static::assertFalse(
+            in_array('unexported@blacklist.com', $emails),
+            'found the blacklisted user in the result set'
+        );
+    }
+
+    private function createExportedCustomer(string $email, string $subscriberId, Shop $shop): void
+    {
+        $customer = new Customer();
+        $customer->setEmail($email);
+        $customer->setShop($shop);
+
+        $customerAttribute = new \Shopware\Models\Attribute\Customer();
+        $customerAttribute->setMailwizzSubscriberId($subscriberId);
+        $customer->setAttribute($customerAttribute);
+
+        $this->modelManager->persist($customer);
+        $this->modelManager->flush();
+    }
+
+    private function createUnexportedCustomer(string $email, Shop $shop): void
+    {
+        $customer = new Customer();
+        $customer->setEmail($email);
+        $customer->setShop($shop);
+
+        $this->modelManager->persist($customer);
+        $this->modelManager->flush();
     }
 }

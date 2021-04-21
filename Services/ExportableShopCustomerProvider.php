@@ -3,7 +3,9 @@
 namespace n2305Mailwizz\Services;
 
 use Doctrine\ORM\Query\Expr\Join;
+use n2305Mailwizz\Utils\PluginConfig;
 use Shopware\Components\Model\ModelManager;
+use Shopware\Components\Model\QueryBuilder;
 use Shopware\Models\Customer\Customer;
 use Shopware\Models\Shop\Shop;
 use Shopware\Models\Attribute\Customer as CustomerAttribute;
@@ -15,32 +17,39 @@ class ExportableShopCustomerProvider implements ShopCustomerProvider
     /** @var ModelManager */
     private $modelManager;
 
-    public function __construct(ModelManager $modelManager)
+    /** @var PluginConfig */
+    private $pluginConfig;
+
+    public function __construct(ModelManager $modelManager, PluginConfig $pluginConfig)
     {
         $this->modelManager = $modelManager;
+        $this->pluginConfig = $pluginConfig;
     }
 
     public function fetch(Shop $shop)
     {
-        $lastUserId = null;
+        $lastUserId = 0;
+
+        $qb = $this->modelManager->createQueryBuilder();
+        $qb->select('customer')
+            ->from(Customer::class, 'customer')
+            ->leftJoin(CustomerAttribute::class, 'attribute', Join::WITH, 'attribute.customer = customer.id')
+            ->where($qb->expr()->isNull('attribute.mailwizzSubscriberId'))
+            ->andWhere($qb->expr()->eq('customer.shop', ':shop'))
+            ->andWhere($qb->expr()->gt('customer.id', ':lastUserId'))
+            ->orderBy('customer.id', 'asc')
+            ->setMaxResults(static::CHUNK_SIZE);
+
+        $this->applyBlacklistedEmailSuffixesFilter($qb);
+
+        $qb->setParameter('shop', $shop);
+
+        $query = $qb->getQuery();
 
         while (true) {
-            $qb = $this->modelManager->createQueryBuilder();
-            $qb->select('customer')
-                ->from(Customer::class, 'customer')
-                ->leftJoin(CustomerAttribute::class, 'attribute', Join::WITH, 'attribute.customer = customer.id')
-                ->where($qb->expr()->isNull('attribute.mailwizzSubscriberId'))
-                ->andWhere($qb->expr()->eq('customer.shop', ':shop'))
-                ->setParameter('shop', $shop)
-                ->orderBy('customer.id', 'asc')
-                ->setMaxResults(static::CHUNK_SIZE);
+            $query->setParameter('lastUserId', $lastUserId);
 
-            if (!is_null($lastUserId)) {
-                $qb->andWhere($qb->expr()->gt('customer.id', ':lastUserId'));
-                $qb->setParameter('lastUserId', $lastUserId);
-            }
-
-            $results = $qb->getQuery()->getResult();
+            $results = $query->getResult();
             $counter = 0;
 
             /** @var Customer $customer */
@@ -52,6 +61,18 @@ class ExportableShopCustomerProvider implements ShopCustomerProvider
             }
 
             if ($counter === 0) break;
+        }
+    }
+
+    private function applyBlacklistedEmailSuffixesFilter(QueryBuilder $qb)
+    {
+        $suffixes = $this->pluginConfig->getEmailBlacklistSuffixes();
+
+        foreach ($suffixes as $idx => $suffix) {
+            $qb->andWhere($qb->expr()->notLike('customer.email', ":bsuffix_$idx"));
+
+            $suffix = addcslashes($suffix, '%_');
+            $qb->setParameter("bsuffix_$idx", "%$suffix");
         }
     }
 }
