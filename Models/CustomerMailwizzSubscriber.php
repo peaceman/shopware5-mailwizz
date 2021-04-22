@@ -41,14 +41,14 @@ class CustomerMailwizzSubscriber extends ModelEntity
     /**
      * @var DateTimeImmutable
      *
-     * @ORM\Column(name="created_at", type="datetimetz_immutable", nullable=false)
+     * @ORM\Column(name="created_at", type="datetime", nullable=false)
      */
     private $createdAt;
 
     /**
      * @var DateTimeImmutable
      *
-     * @ORM\Column(name="updated_at", type="datetimetz_immutable", nullable=true)
+     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      */
     private $updatedAt;
 
@@ -83,12 +83,12 @@ class CustomerMailwizzSubscriber extends ModelEntity
         $this->customer = $customer;
     }
 
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): \DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): DateTimeImmutable
+    public function getUpdatedAt(): \DateTimeInterface
     {
         return $this->updatedAt;
     }
