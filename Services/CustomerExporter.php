@@ -55,9 +55,13 @@ class CustomerExporter
 
         $shop = $customer->getShop();
         $pluginConfig = $this->pluginConfig->forShop($shop);
-        $apiClient = $this->mwApiClientFactory->create($pluginConfig->getMwApiConfig());
+
+        if ($this->isEmailBlacklisted($subscriber->getEmail(), $pluginConfig)) {
+            return;
+        }
 
         try {
+            $apiClient = $this->mwApiClientFactory->create($pluginConfig->getMwApiConfig());
             $subscriberId = $apiClient->createOrUpdateSubscriber(
                 $subscriber,
                 $this->determineSubscriberStatus($subscriber, $exportMode)
@@ -108,5 +112,21 @@ class CustomerExporter
             case $exportMode->isPeriodicImport():
                 return Mailwizz\Subscriber::STATE_CONFIRMED;
         }
+    }
+
+    private function isEmailBlacklisted(string $email, PluginConfig $config): bool
+    {
+        $suffixes = $config->getEmailBlacklistSuffixes();
+
+        foreach ($suffixes as $suffix) {
+            $suffix = preg_quote($suffix, '/');
+            $pattern = "/$suffix$/i";
+
+            if (preg_match($pattern, $email) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

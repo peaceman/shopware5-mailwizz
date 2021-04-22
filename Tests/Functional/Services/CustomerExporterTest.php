@@ -5,6 +5,7 @@ namespace n2305Mailwizz\Tests\Functional\Services;
 use n2305Mailwizz\Mailwizz;
 use n2305Mailwizz\Services\CustomerExporter;
 use n2305Mailwizz\Services\CustomerExportMode;
+use n2305Mailwizz\Tests\PluginConfigMock;
 use n2305Mailwizz\Utils\PluginConfig;
 use Psr\Log\NullLogger;
 use Shopware\Components\Model\ModelManager;
@@ -221,6 +222,56 @@ class CustomerExporterTest extends TestCase
         $pluginConfig->expects(static::never())
             ->method('forShop')
             ->withAnyParameters();
+
+        $mwApiClientFactory = $this->createMock(Mailwizz\ApiClientFactory::class);
+        $mwApiClientFactory->expects(static::never())
+            ->method('create')
+            ->withAnyParameters();
+
+        $exporter = new CustomerExporter(
+            new NullLogger(),
+            $this->modelManager,
+            $pluginConfig,
+            $mwApiClientFactory
+        );
+
+        $exporter->export($customer, CustomerExportMode::adhocUpdate());
+    }
+
+    public function testThatBlacklistedEmailsWontGetExported(): void
+    {
+        $shop = $this->modelManager->find(Shop::class, 1);
+
+        $customer = new Customer();
+        $customer->setEmail('foo@example.com');
+        $customer->setFirstname('foo');
+        $customer->setLastname('bar');
+        $customer->setNewsletter(1);
+        $customer->setShop($shop);
+
+        $this->modelManager->persist($customer);
+        $this->modelManager->flush();
+
+        $mwApiConfig = new Mailwizz\ApiConfig(
+            'https://example.com/api',
+            'public-key',
+            'secret-key',
+            'list-id'
+        );
+
+        $pluginConfig = $this->createMock(PluginConfig::class);
+        $pluginConfig->expects(static::once())
+            ->method('getEmailBlacklistSuffixes')
+            ->willReturn(['example.com']);
+
+        $pluginConfig->expects(static::never())
+            ->method('getMwApiConfig')
+            ->willReturn($mwApiConfig);
+
+        $pluginConfig->expects(static::once())
+            ->method('forShop')
+            ->with($shop)
+            ->willReturnSelf();
 
         $mwApiClientFactory = $this->createMock(Mailwizz\ApiClientFactory::class);
         $mwApiClientFactory->expects(static::never())
