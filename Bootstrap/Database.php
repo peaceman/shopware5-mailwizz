@@ -4,6 +4,7 @@ namespace n2305Mailwizz\Bootstrap;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
+use n2305Mailwizz\Models\CustomerMailwizzSubscriber;
 
 class Database
 {
@@ -52,6 +53,8 @@ class Database
      */
     private function getClassesMetaData()
     {
-        return [];
+        return [
+            $this->entityManager->getClassMetadata(CustomerMailwizzSubscriber::class),
+        ];
     }
 }

@@ -3,6 +3,8 @@
 namespace n2305Mailwizz\Tests\Functional\Services;
 
 use n2305Mailwizz\Mailwizz;
+use n2305Mailwizz\Models\CustomerMailwizzSubscriber;
+use n2305Mailwizz\Models\CustomerMailwizzSubscriberRepo;
 use n2305Mailwizz\Services\CustomerExporter;
 use n2305Mailwizz\Services\CustomerExportMode;
 use n2305Mailwizz\Tests\PluginConfigMock;
@@ -132,10 +134,14 @@ class CustomerExporterTest extends TestCase
         // assert customer has subscriber id
         /** @var Customer $customer */
         $customer = $this->modelManager->find(Customer::class, $customer->getId());
-        $customerAttr = $customer->getAttribute();
+        $this->modelManager->refresh($customer);
 
-        static::assertNotNull($customerAttr, "customer doesn't have an attributes object");
-        static::assertEquals('subscriber-id', $customerAttr->getMailwizzSubscriberId());
+        /** @var CustomerMailwizzSubscriberRepo $subRepo */
+        $subRepo = $this->modelManager->getRepository(CustomerMailwizzSubscriber::class);
+        $subscriber = $subRepo->fetchForCustomer($customer);
+
+        static::assertNotNull($subscriber, "customer doesn't have an attributes object");
+        static::assertEquals('subscriber-id', $subscriber->getSubscriberId());
     }
 
     public function testCustomerExportWithBlacklistedEmail(): void
@@ -193,10 +199,14 @@ class CustomerExporterTest extends TestCase
         // assert customer has the blacklisted subscriber id
         /** @var Customer $customer */
         $customer = $this->modelManager->find(Customer::class, $customer->getId());
-        $customerAttr = $customer->getAttribute();
+        $this->modelManager->refresh($customer);
 
-        static::assertNotNull($customerAttr, "customer doesn't have an attributes object");
-        static::assertEquals('blacklisted', $customerAttr->getMailwizzSubscriberId());
+        /** @var CustomerMailwizzSubscriberRepo $subRepo */
+        $subRepo = $this->modelManager->getRepository(CustomerMailwizzSubscriber::class);
+        $subscriber = $subRepo->fetchForCustomer($customer);
+
+        static::assertNotNull($subscriber, "customer doesn't have an attributes object");
+        static::assertEquals('blacklisted', $subscriber->getSubscriberId());
     }
 
     public function testThatBlacklistedSubscriberIdsWontGetExported(): void
@@ -210,12 +220,12 @@ class CustomerExporterTest extends TestCase
         $customer->setNewsletter(1);
         $customer->setShop($shop);
 
-        $attr = new CustomerAttribute();
-        $attr->setMailwizzSubscriberId(Mailwizz\Subscriber::SUBSCRIBER_ID_BLACKLISTED);
-        $customer->setAttribute($attr);
+        $subscriber = new CustomerMailwizzSubscriber();
+        $subscriber->setCustomer($customer);
+        $subscriber->setSubscriberId(Mailwizz\Subscriber::SUBSCRIBER_ID_BLACKLISTED);
 
         $this->modelManager->persist($customer);
-        $this->modelManager->persist($attr);
+        $this->modelManager->persist($subscriber);
         $this->modelManager->flush();
 
         $pluginConfig = $this->createMock(PluginConfig::class);

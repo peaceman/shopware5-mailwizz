@@ -2,6 +2,9 @@
 
 namespace n2305Mailwizz\Services;
 
+use Doctrine\DBAL\LockMode;
+use n2305Mailwizz\Models\CustomerMailwizzSubscriber;
+use n2305Mailwizz\Subscriber\CustomerSubscriber;
 use n2305Mailwizz\Utils\PluginConfig;
 use n2305Mailwizz\Mailwizz;
 use Psr\Log\LoggerInterface;
@@ -39,7 +42,10 @@ class CustomerExporter
     public function export(Customer $customer, CustomerExportMode $exportMode)
     {
         try {
-            $subscriber = Mailwizz\Subscriber::createFromCustomer($customer);
+            $subscriber = Mailwizz\Subscriber::createFromCustomer(
+                $customer,
+                $this->modelManager->getRepository(CustomerMailwizzSubscriber::class)
+            );
         } catch (Throwable $e) {
             $this->logger->warn('Failed to create subscriber dto from customer', [
                 'customer' => ['id' => $customer->getId(), 'email' => $customer->getEmail()],
@@ -88,13 +94,12 @@ class CustomerExporter
         string $subscriptionId,
         Customer $customer
     ) {
-        $attr = $customer->getAttribute() ?? new CustomerAttribute();
-        $attr->setMailwizzSubscriberId($subscriptionId);
-
-        $customer->setAttribute($attr);
+        $subscriber = new CustomerMailwizzSubscriber();
+        $subscriber->setSubscriberId($subscriptionId);
+        $subscriber->setCustomer($customer);
 
         $this->modelManager->persist($customer);
-        $this->modelManager->persist($attr);
+        $this->modelManager->persist($subscriber);
         $this->modelManager->flush();
     }
 

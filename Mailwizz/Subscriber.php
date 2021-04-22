@@ -2,6 +2,7 @@
 
 namespace n2305Mailwizz\Mailwizz;
 
+use n2305Mailwizz\Models\CustomerMailwizzSubscriberRepo;
 use Shopware\Models\Customer\Customer;
 
 class Subscriber
@@ -41,10 +42,12 @@ class Subscriber
         $this->subscriberId = $subscriberId;
     }
 
-    public static function createFromCustomer(Customer $customer): self
-    {
-        $attr = $customer->getAttribute();
-        $subscriberId = $attr ? $attr->getMailwizzSubscriberId() : null;
+    public static function createFromCustomer(
+        Customer $customer,
+        CustomerMailwizzSubscriberRepo $subscriberRepo
+    ): self {
+        $subscriber = $subscriberRepo->fetchForCustomer($customer);
+        $subscriberId = $subscriber ? $subscriber->getSubscriberId() : null;
 
         return new static(
             $customer->getEmail(),

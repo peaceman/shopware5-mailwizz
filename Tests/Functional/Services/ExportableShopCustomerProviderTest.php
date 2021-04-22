@@ -2,6 +2,7 @@
 
 namespace n2305Mailwizz\Tests\Functional\Services;
 
+use n2305Mailwizz\Models\CustomerMailwizzSubscriber;
 use n2305Mailwizz\Services\ExportableShopCustomerProvider;
 use n2305Mailwizz\Tests\PluginConfigMock;
 use Shopware\Components\Model\ModelManager;
@@ -79,10 +80,11 @@ class ExportableShopCustomerProviderTest extends TestCase
         $customer->setEmail($email);
         $customer->setShop($shop);
 
-        $customerAttribute = new \Shopware\Models\Attribute\Customer();
-        $customerAttribute->setMailwizzSubscriberId($subscriberId);
-        $customer->setAttribute($customerAttribute);
+        $subscriber = new CustomerMailwizzSubscriber();
+        $subscriber->setCustomer($customer);
+        $subscriber->setSubscriberId($subscriberId);
 
+        $this->modelManager->persist($subscriber);
         $this->modelManager->persist($customer);
         $this->modelManager->flush();
     }

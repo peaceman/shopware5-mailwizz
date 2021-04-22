@@ -3,12 +3,12 @@
 namespace n2305Mailwizz\Services;
 
 use Doctrine\ORM\Query\Expr\Join;
+use n2305Mailwizz\Models\CustomerMailwizzSubscriber;
 use n2305Mailwizz\Utils\PluginConfig;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Components\Model\QueryBuilder;
 use Shopware\Models\Customer\Customer;
 use Shopware\Models\Shop\Shop;
-use Shopware\Models\Attribute\Customer as CustomerAttribute;
 
 class ExportableShopCustomerProvider implements ShopCustomerProvider
 {
@@ -33,8 +33,8 @@ class ExportableShopCustomerProvider implements ShopCustomerProvider
         $qb = $this->modelManager->createQueryBuilder();
         $qb->select('customer')
             ->from(Customer::class, 'customer')
-            ->leftJoin(CustomerAttribute::class, 'attribute', Join::WITH, 'attribute.customer = customer.id')
-            ->where($qb->expr()->isNull('attribute.mailwizzSubscriberId'))
+            ->leftJoin(CustomerMailwizzSubscriber::class, 'subscriber', Join::WITH, 'subscriber.customer = customer')
+            ->where($qb->expr()->isNull('subscriber.subscriberId'))
             ->andWhere($qb->expr()->eq('customer.shop', ':shop'))
             ->andWhere($qb->expr()->gt('customer.id', ':lastUserId'))
             ->orderBy('customer.id', 'asc')

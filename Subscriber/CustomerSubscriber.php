@@ -66,6 +66,7 @@ class CustomerSubscriber implements EventSubscriber
                     'email' => $model->getEmail(),
                 ],
                 'exception' => $e,
+                'trace' => $e->getTrace(),
             ]);
         }
     }

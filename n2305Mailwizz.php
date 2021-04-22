@@ -21,12 +21,6 @@ class n2305Mailwizz extends Plugin
         );
 
         $database->install();
-
-        /** @var CrudServiceInterface $crudService */
-        $crudService = $this->container->get('shopware_attribute.crud_service');
-        $crudService->update('s_user_attributes', 'mailwizz_subscriber_id', 'text');
-
-        $this->regenerateAttributeModels(['s_user_attributes']);
     }
 
     public function uninstall(UninstallContext $uninstallContext)
@@ -40,12 +34,6 @@ class n2305Mailwizz extends Plugin
         }
 
         $database->uninstall();
-
-        /** @var CrudServiceInterface $crudService */
-        $crudService = $this->container->get('shopware_attribute.crud_service');
-        $crudService->delete('s_user_attributes', 'mailwizz_subscriber_id');
-
-        $this->regenerateAttributeModels(['s_user_attributes']);
     }
 
     private function regenerateAttributeModels(array $attributeTables)
