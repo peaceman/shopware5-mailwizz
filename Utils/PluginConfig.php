@@ -79,6 +79,11 @@ class PluginConfig
         return array_values($suffixes);
     }
 
+    public function getIgnoreUserDecision(): bool
+    {
+        return $this->fetchFromConfigReader('ignoreUserDecision') ?? false;
+    }
+
     public function hasConfiguredMailwizz(): bool
     {
         static $requiredKeys = ['mwApiUrl', 'mwApiPublicKey', 'mwApiPrivateKey', 'mwListId'];

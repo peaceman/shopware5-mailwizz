@@ -107,6 +107,9 @@ class CustomerExporter
         Mailwizz\Subscriber $subscriber,
         CustomerExportMode $exportMode
     ): string {
+        if ($this->pluginConfig->getIgnoreUserDecision())
+            return Mailwizz\Subscriber::STATE_CONFIRMED;
+
         if (!$subscriber->wantsSubscription()) {
             return Mailwizz\Subscriber::STATE_UNSUBSCRIBED;
         }

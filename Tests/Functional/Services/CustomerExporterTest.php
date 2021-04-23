@@ -144,6 +144,88 @@ class CustomerExporterTest extends TestCase
         static::assertEquals('subscriber-id', $subscriber->getSubscriberId());
     }
 
+    /**
+     * @dataProvider customerExportDataProvider
+     */
+    public function testCustomerExportIgnoreUserDecision(CustomerExportMode $exportMode, int $newsletter, string $status): void
+    {
+        $shop = $this->modelManager->find(Shop::class, 1);
+
+        $customer = new Customer();
+        $customer->setEmail('foo@example.com');
+        $customer->setFirstname('foo');
+        $customer->setLastname('bar');
+        $customer->setNewsletter($newsletter);
+        $customer->setShop($shop);
+
+        $this->modelManager->persist($customer);
+        $this->modelManager->flush();
+
+        $mwApiConfig = new Mailwizz\ApiConfig(
+            'https://example.com/api',
+            'public-key',
+            'secret-key',
+            'list-id'
+        );
+
+        $pluginConfig = $this->createMock(PluginConfig::class);
+        $pluginConfig->expects(static::once())
+            ->method('forShop')
+            ->with($shop)
+            ->willReturnSelf();
+
+        $pluginConfig->expects(static::once())
+            ->method('getIgnoreUserDecision')
+            ->willReturn(true);
+
+        $pluginConfig->expects(static::once())
+            ->method('getMwApiConfig')
+            ->willReturn($mwApiConfig);
+
+        $mwApiClient = $this->createMock(Mailwizz\ApiClient::class);
+        $mwApiClient->expects(static::once())
+            ->method('createOrUpdateSubscriber')
+            ->with(
+                static::callback(static function (Mailwizz\Subscriber $sub) use ($customer): bool {
+                    static::assertEquals($customer->getFirstname(), $sub->getFirstName());
+                    static::assertEquals($customer->getLastname(), $sub->getLastName());
+                    static::assertEquals($customer->getEmail(), $sub->getEmail());
+                    static::assertEquals((bool) $customer->getNewsletter(), $sub->wantsSubscription());
+
+                    return true;
+                }),
+                Mailwizz\Subscriber::STATE_CONFIRMED
+            )
+            ->willReturn('subscriber-id');
+
+        $mwApiClientFactory = $this->createMock(Mailwizz\ApiClientFactory::class);
+        $mwApiClientFactory->expects(static::once())
+            ->method('create')
+            ->with($mwApiConfig)
+            ->willReturn($mwApiClient);
+
+        $exporter = new CustomerExporter(
+            new NullLogger(),
+            $this->modelManager,
+            $pluginConfig,
+            $mwApiClientFactory
+        );
+
+        $exporter->export($customer, $exportMode);
+
+        // assert customer has subscriber id
+        /** @var Customer $customer */
+        $customer = $this->modelManager->find(Customer::class, $customer->getId());
+        $this->modelManager->refresh($customer);
+
+        /** @var CustomerMailwizzSubscriberRepo $subRepo */
+        $subRepo = $this->modelManager->getRepository(CustomerMailwizzSubscriber::class);
+        $subscriber = $subRepo->fetchForCustomer($customer);
+
+        static::assertNotNull($subscriber, "customer doesn't have an attributes object");
+        static::assertEquals('subscriber-id', $subscriber->getSubscriberId());
+    }
+
     public function testCustomerExportWithBlacklistedEmail(): void
     {
         $shop = $this->modelManager->find(Shop::class, 1);
