@@ -46,9 +46,9 @@
 
         <element required="true" type="boolean" scope="shop">
             <name>ignoreUserDecision</name>
-            <value>false</value>
             <label lang="de">Ignoriere Nutzer Newsletter Entscheidung</label>
             <label lang="en">Ignore user newsletter decision</label>
+            <value>false</value>
             <description lang="de">Ignoriere die Entscheidung des Nutzers und exportiere ihn als Confirmed nach Mailwizz</description>
             <description lang="en">Ignore the users decisions and export them as confirmed into mailwizz</description>
         </element>
