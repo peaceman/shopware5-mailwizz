@@ -95,7 +95,7 @@ jobs:
           git clone https://github.com/shopware/shopware /tmp/shopware
           mkdir /tmp/shopware/custom/plugins/n2305Mailwizz
           cp -r * /tmp/shopware/custom/plugins/n2305Mailwizz/
-          printf "DB_USER=root\nDB_PASSWORD=root\nDB_HOST=127.0.0.1\nDB_PORT=3306\nDB_NAME=shopware\n" > /tmp/shopware/.env
+          printf "DB_USER=root\nDB_PASSWORD=root\nDB_HOST=127.0.0.1\nDB_PORT=3306\nDB_NAME=shopware\nSW_HOST=localhost\n" > /tmp/shopware/.env
           cd /tmp/shopware
           git checkout tags/${{ matrix.shopware-versions }}
           make init
