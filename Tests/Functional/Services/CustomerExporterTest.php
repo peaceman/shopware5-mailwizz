@@ -7,14 +7,12 @@ use n2305Mailwizz\Models\CustomerMailwizzSubscriber;
 use n2305Mailwizz\Models\CustomerMailwizzSubscriberRepo;
 use n2305Mailwizz\Services\CustomerExporter;
 use n2305Mailwizz\Services\CustomerExportMode;
-use n2305Mailwizz\Tests\PluginConfigMock;
 use n2305Mailwizz\Utils\PluginConfig;
 use Psr\Log\NullLogger;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Customer\Customer;
 use Shopware\Models\Shop\Shop;
 use Shopware\Tests\Functional\Components\Plugin\TestCase;
-use Shopware\Models\Attribute\Customer as CustomerAttribute;
 
 class CustomerExporterTest extends TestCase
 {
@@ -59,7 +57,7 @@ class CustomerExporterTest extends TestCase
             Mailwizz\Subscriber::STATE_UNSUBSCRIBED,
         ];
 
-        yield 'adhoc / no subscription' => [
+        yield 'adhoc / unconfirmed' => [
             CustomerExportMode::adhocUpdate(),
             1,
             Mailwizz\Subscriber::STATE_UNCONFIRMED,
