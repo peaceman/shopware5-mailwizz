@@ -68,6 +68,7 @@ jobs:
         run: php -m
 
       - name: PHPUnit
+        if: ${{ startsWith(matrix.shopware-versions, 'v5.6') }}
         run: |
           composer install --prefer-dist --no-dev --optimize-autoloader
           mkdir /tmp/shopware
@@ -78,6 +79,21 @@ jobs:
           cd /tmp/shopware
           git checkout tags/${{ matrix.shopware-versions }}
           php psh.phar init --DB_HOST=127.0.0.1 --DB_USER=root --DB_PASSWORD=root --SW_HOST=localhost
+          php /tmp/shopware/bin/console sw:plugin:install --clear-cache --activate n2305Mailwizz
+          /tmp/shopware/vendor/bin/phpunit --configuration custom/plugins/n2305Mailwizz/phpunit.xml.dist
+
+      - name: PHPUnit
+        if: ${{ startsWith(matrix.shopware-versions, 'v5.7') }}
+        run: |
+          composer install --prefer-dist --no-dev --optimize-autoloader
+          mkdir /tmp/shopware
+          git clone https://github.com/shopware/shopware /tmp/shopware
+          mkdir /tmp/shopware/custom/plugins/n2305Mailwizz
+          cp -r * /tmp/shopware/custom/plugins/n2305Mailwizz/
+          printf "DB_USER=root\nDB_PASSWORD=root\nDB_HOST=127.0.0.1\nDB_NAME=shopware\n > /tmp/shopware/.env
+          cd /tmp/shopware
+          git checkout tags/${{ matrix.shopware-versions }}
+          make init
           php /tmp/shopware/bin/console sw:plugin:install --clear-cache --activate n2305Mailwizz
           /tmp/shopware/vendor/bin/phpunit --configuration custom/plugins/n2305Mailwizz/phpunit.xml.dist
 
