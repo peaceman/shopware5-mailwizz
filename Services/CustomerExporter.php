@@ -2,15 +2,12 @@
 
 namespace n2305Mailwizz\Services;
 
-use Doctrine\DBAL\LockMode;
-use n2305Mailwizz\Models\CustomerMailwizzSubscriber;
-use n2305Mailwizz\Subscriber\CustomerSubscriber;
-use n2305Mailwizz\Utils\PluginConfig;
 use n2305Mailwizz\Mailwizz;
+use n2305Mailwizz\Models\CustomerMailwizzSubscriber;
+use n2305Mailwizz\Utils\PluginConfig;
 use Psr\Log\LoggerInterface;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Customer\Customer;
-use Shopware\Models\Attribute\Customer as CustomerAttribute;
 use Throwable;
 
 class CustomerExporter
@@ -47,7 +44,7 @@ class CustomerExporter
                 $this->modelManager->getRepository(CustomerMailwizzSubscriber::class)
             );
         } catch (Throwable $e) {
-            $this->logger->warn('Failed to create subscriber dto from customer', [
+            $this->logger->warning('Failed to create subscriber dto from customer', [
                 'customer' => ['id' => $customer->getId(), 'email' => $customer->getEmail()],
                 'exception' => $e,
             ]);
@@ -74,7 +71,7 @@ class CustomerExporter
             );
 
             if (empty($subscriberId)) {
-                $this->logger->warn('Failed to create or update subscriber', [
+                $this->logger->warning('Failed to create or update subscriber', [
                     'shop' => ['id' => $shop->getId(), 'name' => $shop->getName()],
                     'customer' => ['id' => $customer->getId(), 'email' => $customer->getEmail()],
                 ]);

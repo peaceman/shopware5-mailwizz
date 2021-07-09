@@ -39,7 +39,7 @@ jobs:
       matrix:
         operating-system: [ ubuntu-latest ]
         php-versions: [ '7.2' ]
-        shopware-versions: [ 'v5.6.8' ]
+        shopware-versions: [ 'v5.6.10', 'v5.7.2' ]
     name: Shopware ${{ matrix.shopware-versions }} on PHP ${{ matrix.php-versions }}
     services:
       mysql:

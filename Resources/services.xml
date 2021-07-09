@@ -9,12 +9,14 @@
     <services>
         <service id="n2305_mailwizz.utils.plugin_config"
                  class="n2305Mailwizz\Utils\PluginConfig"
+                 public="true"
         >
             <argument type="service" id="shopware.plugin.cached_config_reader"/>
         </service>
 
         <service id="n2305_mailwizz.subscriber.customer_subscriber"
                  class="n2305Mailwizz\Subscriber\CustomerSubscriber"
+                 public="true"
         >
             <argument type="service" id="corelogger"/>
             <tag name="doctrine.event_subscriber"/>
@@ -22,6 +24,7 @@
 
         <service id="n2305_mailwizz.services.customer_exporter"
                  class="n2305Mailwizz\Services\CustomerExporter"
+                 public="true"
         >
             <argument type="service" id="corelogger"/>
             <argument type="service" id="models"/>
@@ -31,12 +34,14 @@
 
         <service id="n2305_mailwizz.mailwizz.api_client_factory"
                  class="n2305Mailwizz\Mailwizz\ApiClientFactory"
+                 public="true"
         >
             <argument type="service" id="corelogger"/>
         </service>
 
         <service id="n2305_mailwizz.subscriber.export_customers_to_mailwizz"
                  class="n2305Mailwizz\Subscriber\ExportCustomersToMailwizz"
+                 public="true"
         >
             <argument type="service" id="n2305_mailwizz.services.shop_customer_exporter"/>
             <tag name="shopware.event_subscriber"/>
@@ -44,6 +49,7 @@
 
         <service id="n2305_mailwizz.subscriber.export_customers_to_mailwizz_all_shops"
                  class="n2305Mailwizz\Subscriber\ExportCustomersToMailwizzAllShops"
+                 public="true"
         >
             <argument type="service" id="corelogger"/>
             <argument type="service" id="models"/>
@@ -54,6 +60,7 @@
 
         <service id="n2305_mailwizz.services.shop_customer_exporter"
                  class="n2305Mailwizz\Services\ShopCustomerExporter"
+                 public="true"
         >
             <argument type="service" id="corelogger"/>
             <argument type="service" id="n2305_mailwizz.services.shop_customer_provider"/>
@@ -62,6 +69,7 @@
 
         <service id="n2305_mailwizz.services.shop_customer_provider"
                  class="n2305Mailwizz\Services\ExportableShopCustomerProvider"
+                 public="true"
         >
             <argument type="service" id="models"/>
             <argument type="service" id="n2305_mailwizz.utils.plugin_config"/>
@@ -69,6 +77,7 @@
 
         <service id="n2305_mailwizz.controller.backend.mw_api_test"
                  class="n2305Mailwizz\Controller\Backend\MwApiTest"
+                 public="true"
         >
             <argument type="service" id="corelogger"/>
             <argument type="service" id="n2305_mailwizz.mailwizz.api_client_factory"/>
